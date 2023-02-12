@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import "./App.css";
 
-const socket = new WebSocket('https://websocketsserver-hkhn-j8mc-master-fftxtxwyma-lz.a.run.app/');
+const socket = new WebSocket('ws://localhost:8080');
 
 function QuizGame() {
   const [question, setQuestion] = useState('');
