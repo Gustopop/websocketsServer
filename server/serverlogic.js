@@ -11,6 +11,8 @@ let currentQuestionIndex = 0;
 
 let questNr = 0;
 
+const chatMsg = 'Test123';
+
 const questions = [
   { question: 'What is the capital of France?', answer: 'Paris' },
   { question: 'What is the largest planet in our solar system?', answer: 'Jupiter' },
@@ -31,36 +33,64 @@ server.on('connection', (socket) => {
   socket.on('message', (message) => {
     console.log(`Received message from player ${playerId}: ${message}`);
 
-    if (questions[currentQuestionIndex].answer == message) {
-      console.log("Muie corect");
-    }
-    else {
-      console.log("muie incorect");
+    const receivedMessage = JSON.parse(message);
+    //Pentru mine: type = answer message chat
+    //La receive: message
+    if (receivedMessage.type === 'chat'){
+      console.log('Am primit mesajul: ' + receivedMessage.message)
     }
 
+    if (receivedMessage.type === 'answer'){
+      if (questions[currentQuestionIndex].answer == receivedMessage.message) {
+        console.log("Muie corect");
+      }
+      else {
+        console.log("muie incorect");
+      }
+    }
 
-    if (message != "reloadquiz"){
+    if (receivedMessage.type === 'answer'){
       if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++;
         questNr++;
         broadcast(questions[currentQuestionIndex].question, questNr);
       }
       else {
-        //currentQuestionIndex = 0;
-        //startGame();
         endGame();
       }
     }
 
-
-
-    if (message == "reloadquiz"){
+    if (receivedMessage.message == "reloadquiz"){
       currentQuestionIndex = 0;
       questNr = 0;
       startGame();
     }
 
+    if (receivedMessage.type === 'chat'){
+      const someID = playerId;
+      players.forEach((player) => {
+        if (player.socket.readyState === WebSocket.OPEN) {
+          player.socket.send(JSON.stringify({type: 'chat', playerID: someID, chatMsg: receivedMessage.message}));
+        }
+      });
+      console.log("Am trimis mesajul: " + receivedMessage.message);
+    }
+
+    if (receivedMessage.type === 'nameChange'){
+      console.log("Am primit username change: "+ receivedMessage.message);
+      const someName = receivedMessage.message;
+      const prevId = playerId;
+      players.forEach((player) => {
+        if (player.socket.readyState === WebSocket.OPEN) {
+          player.socket.send(JSON.stringify({type: 'nameChange', playerID: someName, prevID: prevId}));
+          console.log("Am trimis numele : " + someName);
+        }
+      });
+      playerId = someName;
+    }
+
   });
+
 
   socket.on('close', () => {
     console.log(`Player ${playerId} has left the game.`);
@@ -93,7 +123,7 @@ function endGame(){
 function broadcast(message) {
   players.forEach((player) => {
     if (player.socket.readyState === WebSocket.OPEN) {
-      player.socket.send(JSON.stringify({ question: message, questNr: questNr }));
+      player.socket.send(JSON.stringify({question: message, questNr: questNr, chatMsg: chatMsg, playerID: player.id}));
     }
   });
 }
