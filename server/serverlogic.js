@@ -89,6 +89,32 @@ server.on('connection', (socket) => {
       playerId = someName;
     }
 
+    if (receivedMessage.type === 'itemChange'){
+      console.log("Am primit item change: "+ receivedMessage.clickedItems + " de la playerul: " + receivedMessage.playerID + " cu indexul : " + receivedMessage.index);
+      const someID = receivedMessage.playerID;
+      const clickedItem = receivedMessage.clickedItems;
+      const index = receivedMessage.index;
+      players.forEach((player) => {
+        if (player.socket.readyState === WebSocket.OPEN) {
+          player.socket.send(JSON.stringify({type: 'itemChange', playerID: someID, clickedItems: clickedItem, index: index}));
+          console.log("Am trimis itemul: " + clickedItem + " de la playerul: " + someID);
+        }
+      });
+    }
+
+    if (receivedMessage.type === 'itemOccupied'){
+      const someID = receivedMessage.playerID;
+      const clickedItem = receivedMessage.clickedItems;
+      const index = receivedMessage.index;
+      players.forEach((player) => {
+        if (player.socket.readyState === WebSocket.OPEN) {
+          player.socket.send(JSON.stringify({type: 'itemOccupied', playerID: someID, clickedItems: clickedItem, index: index}));
+          console.log("Am trimis itemul ocupat: " + clickedItem + " de la playerul: " + someID + " cu indexul: " + index);
+        }
+      });
+    }
+
+
   });
 
 
@@ -124,6 +150,7 @@ function broadcast(message) {
   players.forEach((player) => {
     if (player.socket.readyState === WebSocket.OPEN) {
       player.socket.send(JSON.stringify({question: message, questNr: questNr, chatMsg: chatMsg, playerID: player.id}));
+      player.socket.send(JSON.stringify({type : 'setID', playerID: player.id}));
     }
   });
 }

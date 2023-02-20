@@ -46,14 +46,14 @@
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
   height: 100px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #9f8787;
+  background-color: rgba(176, 174, 174, 0.49);
   border: #0000e3;
-  border-radius: 10px;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-track {
@@ -63,26 +63,22 @@
 .body {
   height: 100vh;
   width: 100%;
-  background-color: #000000;
+  background-color: #dcdcdc;
+  background-image: url('https://tiermaker.com/images/templates/wolvesville-role-ranking-15411501/154115011667149663.png');
+  background-repeat: repeat ;
+  background-blend-mode: overlay ;
 }
 
 
 .other-body {
-  height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  grid-gap: 10px;
   width: 100%;
-  background-color: #000000;
-  background-image: url('https://i.ytimg.com/vi/krtyWW-V0Tw/maxresdefault.jpg');
-  background-size: cover;
-  background-blend-mode: hard-light;
-  background-repeat: no-repeat;
-
-  float: right;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-
+  height: 98vh;
+  margin-top: 10px;
+  margin-right: 15px;
 }
 
 
@@ -116,18 +112,28 @@
 }
 
 .banner {
-  display: flex;
-  width: 20vw;
-  height: 70vh;
   text-align: center;
-  color: whitesmoke;
-  background-color: rgba(10, 0, 104, 0.11);
-
-  border-radius: 25px;
-  border: 2px solid #fdf3fd;
+  color: #000000;
+  background-color: #c4c4c4;
+  border: 1px solid #fdf3fd;
   padding: 10px;
-  animation: shadows 3s infinite;
+  /*animation: shadows 3s infinite;*/
   z-index: 2;
+
+  cursor: pointer; /* add a pointer cursor to indicate clickable items */
+
+}
+.maincolo {
+  grid-column: 1 / -1; /* span all columns */
+  margin: auto; /* center horizontally */
+  text-align: center; /* center text */
+  color: white; /* change text color */
+  background-color: rgba(0, 0, 0, 0.56);
+  width: 100%;
+  height: 10vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -139,47 +145,82 @@
   color: whitesmoke;
   justify-content: center;
   align-content: center;
-  background-color: rgba(10, 0, 104, 0.11);
+  background-color: white;
 
   border-radius: 25px;
   border: 2px solid #fdf3fd;
   padding: 10px;
   animation: shadows 3s infinite;
   z-index: 1;
+
 }
 
 .chat-box {
-  background-color: #400788;
   padding: 20px;
   border-radius: 0px;
-  animation: shadows 3s infinite;
   top: 0;
   left: 0;
   z-index: 3;
   height: 100%;
-  width: 230px;
+  width: 390px;
   flex-grow: 1;
 
 }
 
-.chat-box-header {
+.chat-box-header1 {
   text-align: center;
-  color: whitesmoke;
+  color: black;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #ededed;
+  margin-top: -10px;
+  height: 6%;
+  width: 370px;
+  border-radius: 3px;
+  border: 2px solid rgba(176, 174, 174, 0.58);
+  margin-left: -10px;
 
 }
+
+.chat-box-header2 {
+  text-align: center;
+  color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ededed;
+  height: 23%;
+  width: 370px;
+  border-radius: 3px;
+  border: 2px solid rgba(176, 174, 174, 0.58);
+  margin-left: -10px;
+
+}
+
+.chat-box-content {
+  height: 70.74%;
+  width: 100%;
+}
+
 
 .chat-history {
   list-style: none;
   padding: 0;
-  margin: -15px;
-  max-height: 85%;
+  margin-left: -10px;
+  margin-top: -20px;
+  height: 96% ;
+  max-width: 370px;
   overflow-y: scroll;
   scroll-behavior: smooth;
-  width: 230px;
-  color: whitesmoke;
+  width: 370px;
+  color: #2b2b2b;
+  word-wrap: break-word;
+  word-break: break-word;
+  background-color: #ededed;
+
+  border-radius: 3px;
+  border: 2px solid rgba(176, 174, 174, 0.58);
 }
 
 
@@ -189,30 +230,37 @@
   border-radius: 10px;
 }
 
+.system-message {
+  font-style: italic;
+  color: #ba5f80;
+}
+
 .player-id {
   font-weight: bold;
-  color: #000000;
+  color: #000001;
 }
 
 .chat-form {
   display: flex;
   align-items: center;
   margin-top: 0px;
-  position: absolute;
+  position: relative;
   bottom: 0vh;
 }
 
 .chat-input {
   padding: 10px;
-  margin-right: 10px;
-  margin-left: -20px;
-  border-radius: 3px;
-  border: none;
+  margin-left: -10px;
+  margin-bottom: 0px;
   outline: none;
   flex-grow: 1;
-  width: 230px;
+  width: 370px;
   background-color: #ffffff;
   color: #000000;
+  position: absolute;
+
+  border-radius: 3px;
+  border: 2px solid rgba(176, 174, 174, 0.58);
 
 }
 
@@ -221,6 +269,7 @@
   justify-content: flex-start;
   align-items: center;
   position: relative;
+  margin-bottom: 10px;
 }
 
 .menu-toggle {

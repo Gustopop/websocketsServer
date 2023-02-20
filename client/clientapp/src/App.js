@@ -20,6 +20,13 @@ function QuizGame() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const usernameRules = /^[a-zA-Z0-9]+$/;
+    const [leftSide, setLeftSide] = useState('');
+    const [rightSide, setRightSide] = useState('');
+
+
+    const [clickedItems, setClickedItems] = useState(Array(16).fill(false));
+    const [playerIds, setPlayerIds] = useState(Array(16).fill(''));
+    const [prevName, setPrevName] = useState('');
 
 
     useEffect(() => {
@@ -42,8 +49,11 @@ function QuizGame() {
                 setQuestion(data.question);
             }
 
-
-            console.log(("Am setat playerid: " + data.playerID));
+            if (data.type === 'setID'){
+                setPlayerId(data.playerID);
+                console.log(("Am setat playerid: " + data.playerID));
+            }
+            //console.log(("Am setat playerid: " + data.playerID));
 
             if (data.type === 'chat') {
                 setPlayerId(data.playerID);
@@ -55,6 +65,19 @@ function QuizGame() {
                 setPlayerId(data.playerID);
                 setChatHistory((prev) => [...prev, {playerid: 'SYSTEM', message: `Player ${data.prevID} changed their name to ${data.playerID}`}]);
             }
+
+            if (data.type === 'itemChange') {
+                setClickedItems(data.clickedItems);
+                setPlayerIds(data.playerID);
+            }
+
+            if(data.type === 'itemOccupied'){
+                setClickedItems(data.clickedItems);
+                setPlayerIds(data.playerID);
+            }
+
+
+
 
         };
 
@@ -70,6 +93,7 @@ function QuizGame() {
             chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
         }
     }, [chatHistory]);
+
 
 
     const submitAnswer = () => {
@@ -101,6 +125,7 @@ function QuizGame() {
         setChatMessage('');
     };
 
+
     function toggleMenu() {
         setShowMenu(!showMenu);
     }
@@ -118,15 +143,15 @@ function QuizGame() {
             // TODO: update username in chat app state
             setUsername(username);
             setShowMenu(false);
+            setPrevName(playerId);
             socket.send(JSON.stringify({type: 'nameChange', message: username}));
+
         }
         else{
             notification['error']({
                 message: 'Invalid Username Settings',
             });
         }
-
-
     }
 
 
@@ -142,33 +167,68 @@ function QuizGame() {
         setIsModalOpen(false);
     };
 
+    const handleClick = (index) => {
+        // Create a new copy of the clickedItems and playerIds arrays
+        const newClickedItems = [...clickedItems];
+        const newPlayerIds = [...playerIds];
+
+        // Check if the current player has already clicked on an item
+        if (newPlayerIds.includes(playerId)) {
+            const index2 = newPlayerIds.indexOf(playerId);
+            console.log(`You have already occupied item ${index2 + 1}!`);
+            newClickedItems[index2] = false;
+            newPlayerIds[index2] = '';
+            socket.send(JSON.stringify({type: 'itemOccupied', clickedItems: newClickedItems, playerID: newPlayerIds, index: index2}));
+        }
+
+
+        // Toggle the value of the clicked item and set the playerId
+        newClickedItems[index] = true;
+        newPlayerIds[index] = playerId; // replace with the actual playerId
+
+        // Update state
+        setClickedItems(newClickedItems);
+        setPlayerIds(newPlayerIds);
+        socket.send(JSON.stringify({type: 'itemChange', clickedItems: newClickedItems, playerID: newPlayerIds, index: index}));
+    };
+
 
     return (
         <div className="body">
             <div className="body-chat">
                 <div className="chat-container">
                 <div className="chat-box">
-                    <h1 className="chat-box-header">Ce naiba</h1>
+                    <h1 className="chat-box-header1">Meniu mic</h1>
+                    <h1 className="chat-box-header2">Lista roluri</h1>
                     <button className="menu-toggle" onClick={toggleMenu}>⚙️</button>
-                    <ul className="chat-history" ref={chatHistoryRef}>
-                        {chatHistory.map((item, index) => (
-                            <li key={index} className="chat-history-item">
-                                <span className="player-id">{'Player ' + item.playerid}: </span>
-                                <span className="message">{item.message}</span>
-                            </li>
-                        ))}
-                    </ul>
-                    <form className="chat-form" onSubmit={handleSubmit}>
-                        <input
-                            className="chat-input"
-                            type="text"
-                            placeholder="Enter your message"
-                            aria-label="Enter your message"
-                            value={chatMessage}
-                            onChange={e => setChatMessage(e.target.value)}
-                        />
+                    <div className="chat-box-content">
+                        <ul className="chat-history" ref={chatHistoryRef}>
+                            {chatHistory.map((item, index) => (
+                                <li key={index} className="chat-history-item">
 
-                    </form>
+                                <span className={`${item.playerid === 'SYSTEM' ? 'system-message' : 'player-id'}`}>
+                                {item.playerid === 'SYSTEM' ? 'Server message' : 'Player ' + item.playerid}:
+                                </span>
+
+                                    <span className={`message ${item.playerid === 'SYSTEM' ? 'system-message' : ''}`}>
+                                {item.message}
+                                </span>
+                                </li>
+                            ))}
+                        </ul>
+                        <form className="chat-form" onSubmit={handleSubmit}>
+                            <input
+                                className="chat-input"
+                                type="text"
+                                placeholder="Type your message"
+                                aria-label="Type your message"
+                                value={chatMessage}
+                                onChange={e => setChatMessage(e.target.value)}
+                            />
+
+                        </form>
+                    </div>
+
 
                     {showMenu && (
                         <div className= "menu">
@@ -184,59 +244,16 @@ function QuizGame() {
                     </div>
 
                 <div className="other-body">
-                    <h2 style={{textAlign: "center", color: "white"}}>Raspunde la urmatoarea antrebare</h2>
-                    <h2 style={{textAlign: "center", color: "white"}}>{question}</h2>
-
-                    <div style={{display: "flex", alignItems: "flex-start"}}>
-                        <div className="col-md-4">
-                            <div className="banner">
-                                <div className="card-body">
-                                    <h5 className="card-title">Left Banner</h5>
-                                </div>
-                            </div>
+                    {Array(16).fill().map((_, index) => (
+                        <div
+                            key={index}
+                            className={`banner ${clickedItems[index] ? 'clicked' : ''}`}
+                            onClick={() => handleClick(index)}
+                        >
+                            {playerIds[index]}
                         </div>
-
-                        <div className="col-md-4">
-                            <div className="bannerCenter">
-                                <div className="card-body">
-                                    <div>
-                                        <div className="form-check form-check-inline">
-                                            <input className="form-check-input" type="radio" name="answer" id="answer1" value="Paris" onChange={(event) => setAnswer(event.target.value)} />
-                                            <label className="form-check-label" htmlFor="answer1">
-                                                Paris
-                                            </label>
-                                        </div>
-
-                                        <div className="form-check form-check-inline">
-                                            <input className="form-check-input" type="radio" name="answer" id="answer2" value="Mata" onChange={(event) => setAnswer(event.target.value)} />
-                                            <label className="form-check-label" htmlFor="answer2">
-                                                Mata
-                                            </label>
-                                        </div>
-
-                                        <div className="form-check form-check-inline">
-                                            <input className="form-check-input" type="radio" name="answer" id="answer3" value="Muie" onChange={(event) => setAnswer(event.target.value)} />
-                                            <label className="form-check-label" htmlFor="answer3">
-                                                Muie
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-md-4">
-                            <div className="banner">
-                                <div className="card-body">
-                                    <h5 className="card-title">Right Banner</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-                        <button className="btn btn-primary test" onClick={submitAnswer}>Submit</button>
-                    </div>
+                    ))}
+                    <div className="maincolo">Mai incolo ceva meniu</div>
                 </div>
             </div>
         </div>
