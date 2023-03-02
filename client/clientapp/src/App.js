@@ -27,6 +27,7 @@ function QuizGame() {
     const [clickedItems, setClickedItems] = useState(Array(16).fill(false));
     const [playerIds, setPlayerIds] = useState(Array(16).fill(''));
     const [prevName, setPrevName] = useState('');
+    const [pfp, setPfp] = useState('');
 
 
     useEffect(() => {
@@ -51,6 +52,12 @@ function QuizGame() {
 
             if (data.type === 'setID'){
                 setPlayerId(data.playerID);
+                if (data.playerID === 1){
+                    setPfp('"url(https://www.clipartmax.com/png/middle/311-3112095_image-cute-wolf-stickers.png)"');
+                }
+                else if (data.playerID === 2){
+                    setPfp('"url(https://img.favpng.com/4/14/1/paper-gray-wolf-sticker-png-favpng-0tKw6qXe0eNUHjVMZqRRSMK1r.jpg)"');
+                }
                 console.log(("Am setat playerid: " + data.playerID));
             }
             //console.log(("Am setat playerid: " + data.playerID));
@@ -172,25 +179,36 @@ function QuizGame() {
         const newClickedItems = [...clickedItems];
         const newPlayerIds = [...playerIds];
 
-        // Check if the current player has already clicked on an item
-        if (newPlayerIds.includes(playerId)) {
-            const index2 = newPlayerIds.indexOf(playerId);
-            console.log(`You have already occupied item ${index2 + 1}!`);
-            newClickedItems[index2] = false;
-            newPlayerIds[index2] = '';
-            socket.send(JSON.stringify({type: 'itemOccupied', clickedItems: newClickedItems, playerID: newPlayerIds, index: index2}));
+        if (newClickedItems[index] === false) {
+            if (newPlayerIds.includes(playerId)) {
+                const index2 = newPlayerIds.indexOf(playerId);
+                console.log(`You have already occupied item ${index2 + 1}!`);
+                newClickedItems[index2] = false;
+                newPlayerIds[index2] = '';
+                socket.send(JSON.stringify({type: 'itemOccupied', clickedItems: newClickedItems, playerID: newPlayerIds, index: index2}));
+            }
         }
 
 
-        // Toggle the value of the clicked item and set the playerId
-        newClickedItems[index] = true;
-        newPlayerIds[index] = playerId; // replace with the actual playerId
 
-        // Update state
-        setClickedItems(newClickedItems);
-        setPlayerIds(newPlayerIds);
-        socket.send(JSON.stringify({type: 'itemChange', clickedItems: newClickedItems, playerID: newPlayerIds, index: index}));
+        if (newClickedItems[index] === true) {
+            notification['error']({
+                message: 'Position already occupied!',
+            });
+        }
+        else{
+            // Toggle the value of the clicked item and set the playerId
+            newClickedItems[index] = true;
+            newPlayerIds[index] = playerId; // replace with the actual playerId
+
+            // Update state
+            setClickedItems(newClickedItems);
+            setPlayerIds(newPlayerIds);
+            socket.send(JSON.stringify({type: 'itemChange', clickedItems: newClickedItems, playerID: newPlayerIds, index: index}));
+        }
+
     };
+
 
 
     return (
@@ -246,14 +264,15 @@ function QuizGame() {
                 <div className="other-body">
                     {Array(16).fill().map((_, index) => (
                         <div
+                            id = "pfp"
                             key={index}
                             className={`banner ${clickedItems[index] ? 'clicked' : ''}`}
                             onClick={() => handleClick(index)}
                         >
-                            {playerIds[index]}
+                            <div className="playername">{playerIds[index]}</div>
                         </div>
                     ))}
-                    <div className="maincolo">Mai incolo ceva meniu</div>
+                    <div className="maincolo">Some menu for later</div>
                 </div>
             </div>
         </div>

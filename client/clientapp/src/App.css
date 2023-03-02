@@ -78,7 +78,7 @@
   width: 100%;
   height: 98vh;
   margin-top: 10px;
-  margin-right: 15px;
+  margin-right: 5px;
 }
 
 
@@ -115,6 +115,10 @@
   text-align: center;
   color: #000000;
   background-color: #c4c4c4;
+  background-image: url("https://w7.pngwing.com/pngs/670/774/png-transparent-heart-computer-icons-symbol-small-sign-love-text-black.png");
+  background-repeat: no-repeat;
+    background-position: center;
+  background-size: cover;
   border: 1px solid #fdf3fd;
   padding: 10px;
   /*animation: shadows 3s infinite;*/
@@ -123,6 +127,22 @@
   cursor: pointer; /* add a pointer cursor to indicate clickable items */
 
 }
+
+.playername {
+  position: center;
+  margin-left: 10%;
+  text-align: center;
+  font-weight: bold;
+  color: #000000;
+  background-color: rgba(126, 126, 126, 0.37);
+  border: 1px solid #4e4e4e;
+  border-radius: 3px;
+  height: 20%;
+  width: 80%;
+
+}
+
+
 .maincolo {
   grid-column: 1 / -1; /* span all columns */
   margin: auto; /* center horizontally */
