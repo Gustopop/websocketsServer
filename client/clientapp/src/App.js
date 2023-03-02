@@ -148,10 +148,19 @@ function QuizGame() {
 
             console.log(`New username: ${username}`);
             // TODO: update username in chat app state
+            setPrevName(playerId);
             setUsername(username);
             setShowMenu(false);
-            setPrevName(playerId);
             socket.send(JSON.stringify({type: 'nameChange', message: username}));
+
+            const newClickedItems = [...clickedItems];
+            const newPlayerIds = [...playerIds];
+            if (newPlayerIds.includes(prevName || playerId)) {
+                const index2 = newPlayerIds.indexOf(playerId || prevName);
+                newClickedItems[index2] = true;
+                newPlayerIds[index2] = username;
+                socket.send(JSON.stringify({type: 'itemChange', clickedItems: newClickedItems, playerID: newPlayerIds}));
+            }
 
         }
         else{
