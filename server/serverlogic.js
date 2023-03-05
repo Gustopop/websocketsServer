@@ -9,15 +9,7 @@ let nextPlayerId = 1;
 let usedIds = new Set();
 let currentQuestionIndex = 0;
 
-let questNr = 0;
-
 const chatMsg = 'Test123';
-
-const questions = [
-  { question: 'What is the capital of France?', answer: 'Paris' },
-  { question: 'What is the largest planet in our solar system?', answer: 'Jupiter' },
-  { question: 'Who painted the Mona Lisa?', answer: 'Leonardo da Vinci' }
-];
 
 server.on('connection', (socket) => {
   console.log('A player has joined the game!');
@@ -40,31 +32,6 @@ server.on('connection', (socket) => {
       console.log('Am primit mesajul: ' + receivedMessage.message)
     }
 
-    if (receivedMessage.type === 'answer'){
-      if (questions[currentQuestionIndex].answer == receivedMessage.message) {
-        console.log("Muie corect");
-      }
-      else {
-        console.log("muie incorect");
-      }
-    }
-
-    if (receivedMessage.type === 'answer'){
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-        questNr++;
-        broadcast(questions[currentQuestionIndex].question, questNr);
-      }
-      else {
-        endGame();
-      }
-    }
-
-    if (receivedMessage.message == "reloadquiz"){
-      currentQuestionIndex = 0;
-      questNr = 0;
-      startGame();
-    }
 
     if (receivedMessage.type === 'chat'){
       const someID = playerId;
@@ -125,21 +92,23 @@ server.on('connection', (socket) => {
 
     if (nextPlayerId > 1 && nextPlayerId < 3) nextPlayerId--;
 
-    currentQuestionIndex = 0;
-    questNr = 0;
     startGame();
 
   });
 
   if (players.length === 2) {
     startGame();
+    //TODO : poate adaug ceva aici
   }
 });
 
 function startGame() {
-  currentQuestionIndex = 0;
-  questNr = 0;
-  broadcast(questions[currentQuestionIndex].question);
+//TODO: poate adaug ceva aici
+  players.forEach((player) => {
+    if (player.socket.readyState === WebSocket.OPEN) {
+      player.socket.send(JSON.stringify({type : 'setID', playerID: player.id}));
+    }
+  });
 }
 
 function endGame(){

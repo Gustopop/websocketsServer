@@ -155,7 +155,7 @@ function QuizGame() {
 
             const newClickedItems = [...clickedItems];
             const newPlayerIds = [...playerIds];
-            if (newPlayerIds.includes(prevName || playerId)) {
+            if (newPlayerIds.includes(prevName) || newPlayerIds.includes(playerId)) {
                 const index2 = newPlayerIds.indexOf(playerId || prevName);
                 newClickedItems[index2] = true;
                 newPlayerIds[index2] = username;
