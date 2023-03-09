@@ -111,10 +111,6 @@ function startGame() {
   });
 }
 
-function endGame(){
-  broadcast("quizOver");
-}
-
 function broadcast(message) {
   players.forEach((player) => {
     if (player.socket.readyState === WebSocket.OPEN) {

@@ -1,14 +1,10 @@
 import React, {useState, useEffect, useRef} from 'react';
 import "./App.css";
-import {Button, Modal, notification} from 'antd';
+import {notification} from 'antd';
 
 const socket = new WebSocket('ws://localhost:8080');
 
 function QuizGame() {
-    const [question, setQuestion] = useState('');
-    const [answer, setAnswer] = useState('');
-    const [quizOver, setQuizOver] = useState(false);
-    const [questNr, setQuestNr] = useState(0);
 
     const [chatMessage, setChatMessage] = useState('');
     const [chatHistory, setChatHistory] = useState([]);
@@ -18,49 +14,22 @@ function QuizGame() {
     const [showMenu, setShowMenu] = useState(false);
     const [username, setUsername] = useState('');
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const usernameRules = /^[a-zA-Z0-9]+$/;
-    const [leftSide, setLeftSide] = useState('');
-    const [rightSide, setRightSide] = useState('');
 
 
     const [clickedItems, setClickedItems] = useState(Array(16).fill(false));
     const [playerIds, setPlayerIds] = useState(Array(16).fill(''));
     const [prevName, setPrevName] = useState('');
-    const [pfp, setPfp] = useState('');
 
 
     useEffect(() => {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            //console.log(data.questNr);
-
-            if (data.questNr) {
-                console.log(data.questNr);
-                setQuestNr(data.questNr);
-                console.log(data.questNr);
-            }
-
-            if (data.question === 'quizOver') {
-                setQuizOver(true);
-                return;
-            }
-
-            if (data.question) {
-                setQuestion(data.question);
-            }
 
             if (data.type === 'setID'){
                 setPlayerId(data.playerID);
-                if (data.playerID === 1){
-                    setPfp('"url(https://www.clipartmax.com/png/middle/311-3112095_image-cute-wolf-stickers.png)"');
-                }
-                else if (data.playerID === 2){
-                    setPfp('"url(https://img.favpng.com/4/14/1/paper-gray-wolf-sticker-png-favpng-0tKw6qXe0eNUHjVMZqRRSMK1r.jpg)"');
-                }
                 console.log(("Am setat playerid: " + data.playerID));
             }
-            //console.log(("Am setat playerid: " + data.playerID));
 
             if (data.type === 'chat') {
                 setPlayerId(data.playerID);
@@ -102,29 +71,6 @@ function QuizGame() {
     }, [chatHistory]);
 
 
-
-    const submitAnswer = () => {
-        socket.send(JSON.stringify({type: 'answer', message: answer}));
-        setAnswer('');
-        console.log(answer);
-    };
-
-    const reloadQuiz = () => {
-        socket.send(JSON.stringify({type: 'message', message: "reloadquiz"}));
-        setQuizOver(false);
-    }
-
-    if (quizOver) {
-        return (
-            <div>
-                <h2 style={{textAlign: "center", color: "white"}}>Quiz Over</h2>
-                <h2 style={{textAlign: "center", color: "white"}}>Congratulations!</h2>
-                <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-                    <button onClick={reloadQuiz}>Reload Quiz!</button>
-                </div>
-            </div>
-        );
-    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -170,19 +116,6 @@ function QuizGame() {
         }
     }
 
-
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
-
     const handleClick = (index) => {
         // Create a new copy of the clickedItems and playerIds arrays
         const newClickedItems = [...clickedItems];
@@ -217,6 +150,8 @@ function QuizGame() {
         }
 
     };
+
+
 
 
 
@@ -273,7 +208,7 @@ function QuizGame() {
                 <div className="other-body">
                     {Array(16).fill().map((_, index) => (
                         <div
-                            id = "pfp"
+                            id = {'pfp'}
                             key={index}
                             className={`banner ${clickedItems[index] ? 'clicked' : ''}`}
                             onClick={() => handleClick(index)}
